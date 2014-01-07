@@ -8,6 +8,7 @@
     "height": 500
   },
   "dependencies": {
-    "nedb": "~0.9.3"
+    "nedb": "~0.9.3",
+    "gaze": "~0.4.3"
   }
 }

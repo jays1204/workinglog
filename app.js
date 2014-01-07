@@ -27,6 +27,7 @@ $(document).ready(function() {
 
   jQuery("#delRepo").on('click', function () {
     //dir list 목록 보여주는 popup 보여주자
+    
   });
 
 });
@@ -45,14 +46,14 @@ function loadRepositoryList(jQuery, callback) {
     + "<button class='btn btn-mini'><i class='icon-minus'></i></button></a></li>";
       jQuery("div.well ul.nav-list li.divider").before(liElement);
       // 삭제 버튼에 이벤트 달기
-      triggerDeleteRepositoryEvenet();
+      triggerDeleteRepositoryEvenet(jQuery);
     }
     return callback(null);   
   });
 }
 
 function triggerDeleteRepositoryEvenet() {
-
+  console.log('aaa');
 }
 
 function addRepository(jQuery) {
