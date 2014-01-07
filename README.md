@@ -8,7 +8,7 @@
     Yes
       feature branch name and commit message 
     No
-      only commit message
+      only commit message.
 
 - store history depends on date
 
