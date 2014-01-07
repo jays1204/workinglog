@@ -1,5 +1,5 @@
 {
-  "name": "FileExplorer",
+  "name": "WorkingLog",
   "description": "Simple file explorer.",
   "main": "index.html",
   "window": {
