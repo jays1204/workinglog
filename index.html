@@ -22,17 +22,24 @@
   <div class="well" style="width: 160px; padding: 8px;">
     <ul class="nav nav-list">
       <li class="nav-header">Repository List</li>
-      <li class="dirList"><a href="#" value="/Users/skplanet/project/privateProject/recomics"><i class="icon-book"></i>test<button class="btn btn-mini"><i class="icon-minus"></i></button></a></li>
+      <li class="dirList" style="display: -webkit-inline-box;"><a href="#" value="/Users/skplanet/project/privateProject/recomics"><i class="icon-book"></i>test</a><button class="btn btn-mini"><i class="icon-minus"></i></button></li>
       <li class="divider"></li>
       <li><a href="#"><i class="icon-flag"></i> About</a></li>
     </ul>
   </div>
   
-  <div class="editRepository" style="float: left; witdh 160px; padding: 8px;">
+  <div class="editRepository" style="witdh: 160px; padding: 8px;">
     <h5>Repository Management</h5>
     <div class="btn-group">
       <input type="file" id="addRepoInput" webkitdirectory directory multiple style="visibility: hidden; display: block; width: 0; height: 0;"/>
       <button type-"button" class="btn btn-default" id="addRepo">Add</button>
+    </div>
+  </div>
+
+  <div class="setDuration" style="float: left; width: 160px; padding: 8px;">
+    <h5>Set Duration</h5>
+    <div class="btn-group">
+      <button class="btn btn-default">Entire</button>
     </div>
   </div>
 
@@ -42,10 +49,23 @@
     </div>
     <div class="row" style="background: #FFF; -webkit-border-radius: 2px; margin: -5px 1px 0 -19px; height: 100%; overflow: auto">
       <ul style="margin: 5px;" id="myLog"></ul>
+      <table class="table table-striped table-boardered table-hover">
+        <thead>
+          <tr>
+            <th>Commit Hash</th>
+            <th>Commit Message</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>  
+            <td>a</td>
+            <td>b</td>
+            <td>c</td>
+          </tr>
+        </tbody>
+      </table>
       <!-- <ul style="margin: 5px;" id="files"></ul> -->
-    </div>
-    <div class="row">
-      <input type="text" />
     </div>
   </div>
 </div>

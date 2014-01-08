@@ -1,26 +1,26 @@
 global.$ = $;
 
 var fs = require('fs');
-var author = "jays";
-var spawn = require('child_process').spawn;
-var workingDirPath = "";
-var developLog = "";
-var logWithoutFeature = "";
-var sinceDate = "2014-01-01";
-var untilDate = "2014-01-08";
-var abar = require('address_bar');
-var folder_view = require('folder_view');
 var path = require('path');
 var shell = require('nw.gui').Shell;
 var step = require('step');
 var Datastore = require('nedb');
 var path = require('path')
 var db = new Datastore({ filename: path.join(require('nw.gui').App.dataPath, 'list.db') });
+var logFetcher = require('./fetchGitLog.js');
+var author = "jays";
+
+var workingDirPath = "";
+var logWithoutFeature = "";
+var sinceDate = "2014-01-01";
+var untilDate = "2014-01-08";
 
 $(document).ready(function() {
   //init setting
   var jQuery = $;
   db.loadDatabase();
+
+
   loadRepositoryList(jQuery, function (err) {
   });
 
@@ -29,39 +29,63 @@ $(document).ready(function() {
 });
 
 function loadRepositoryList(jQuery, callback) {
-  db.find({}, function (err, docs) {
-    if (err) {
-      return callback(err);
-    }
+  step(
+      function getAuthorName() {
+        db.findOne({'author' : true}, this);
+      }, function findRepositoryList(err, doc) {
+        if (err) {
+          return callback(err);
+        }
+        //author이름 없으면 입력 받고 저장.
 
-    //기존 dirList class모두 지우자.
-    jQuery("div.well ul.nav-list li.dirList").remove();
+        db.find({}, this);
+      }, function displayRepositoryList(err, docs) {
+        if (err) {
+          return callback(err);
+        }
 
-    for (var i = 0, li = docs.length; i < li; i++) {
-      var liElement = "<li class='dirList'><a href='#' value='" + docs[i].path + "'><i class='icon-book'></i>" + docs[i].name 
-    + "<button class='btn btn-mini'><i class='icon-minus'></i></button></a></li>";
-      jQuery("div.well ul.nav-list li.divider").before(liElement);
-      // 삭제 버튼에 이벤트 달기
-      // a[value=]이용해서 달자.
-    triggerDeleteRepositoryEvenet(jQuery, docs[i].path, docs[i].name);
-    }
-    return callback(null);   
-  });
+        //기존 dirList class모두 지우자.
+        jQuery("div.well ul.nav-list li.dirList").remove();
+
+        //insert repository element and trigger display and  delete event
+        for (var i = 0, li = docs.length; i < li; i++) {
+          var liElement = "<li class='dirList' style='display: -webkit-inline-box;'><a href='#' value='" + docs[i].path + "'><i class='icon-book'></i>" + docs[i].name 
+    + "</a><button class='btn btn-mini'><i class='icon-minus'></i></button></li>";
+          jQuery("div.well ul.nav-list li.divider").before(liElement);
+
+          triggerDiplasyLogOnRepositoryEvenet(jQuery, docs[i].path, docs[i].name);
+          triggerDeleteRepositoryEvenet(jQuery, docs[i].path, docs[i].name);
+        }
+        return callback(null);   
+      }
+  );
 }
 
 function triggerDiplasyLogOnRepositoryEvenet(jQuery, gitDirPath, name) {
+  jQuery("a[value='" + gitDirPath + "']").on('click', function () {
+    jQuery("#addressbar li").remove();
+    jQuery("#addressbar").append("<li>" + name + "</li>");
 
-  fetchDevelopLog(gitDirPath, function (err, logArr) {
-    if (err) {
-      console.log('display log err', err);
-    }
+    jQuery("div.row table.table tbody tr").remove();
+    logFetcher.developLog(gitDirPath, author, function (err, logArr) {
+      if (err) {
+        console.log('display log err', err);
+      }
 
-    console.log('view', logArr);
+      if (logArr.length === 0) {
+        jQuery("#myLog").append("<li><h3>Empty log</h3></li>");
+      }
+
+      for (var i = 0, li = logArr.length; i < li; i++) {
+        var trElement = "<tr><td>"+ logArr[i].hash + "</td><td>" + logArr[i].message + "</td><td>" + logArr[i].date + "</td></tr>";
+        jQuery("div.row table.table tbody").append(trElement);
+      }
+    });
   });
 }
 
 function triggerDeleteRepositoryEvenet(jQuery, value, name) {
-  jQuery("a[value='" + value + "'] i.icon-minus").on('click', function () {
+  jQuery("a[value='" + value + "']").next().on('click', function () {
     //delete data on db;
     db.find({'name' : name} , function (err, docs) {
       if (err) {
@@ -133,11 +157,8 @@ function addRepository(jQuery) {
             }
           });
         } else {
-          //alert 이 디렉토리는 git dir이 아니거나 git root dir이 아닙니다. .git을 찾을 수 없습니다.
           alert("This Directory is not git repository. Can't find .git!");
         }
-        
-
       });
 
     });
@@ -164,60 +185,3 @@ function fetchAbsolutePath(fileList) {
 }
 
 
-var spawnDevelopLog = spawn("git", ["log", "--first-parent", "--author=" + author, "--pretty=format:{\"message\": \"%s\", \"date\": \"%ad\"}"], [{cwd: workingDirPath}]);
-var spawnGitLogWithDuration = spawn("git", ["log", "--since=" + sinceDate, "--until=" + untilDate, "--author=" + author, "--pretty=format:{\"message\": \"%s\", \"date\": \"%ad\"}"], [{cwd : workingDirPath}]);
-var spawnGitLogForTeamMeeting = spawn("git", ["log", "--since=1.weeks", "--author=" + author, "--pretty=format:{\"message\": \"%s\", \"date\": \"%ad\"}"], [{cwd : workingDirPath}]);
-
-function fetchDevelopLog(gitDirPath, callback) {
-  var spawnGitLog = spawn("git", ["log", "--author=" + author, "--pretty=format:{\"message\": \"%s\", \"date\": \"%ad\"}"], [{cwd : gitDirPath}]);
-  spawnGitLog.stdout.on('data', function (data) {
-    developLog += data;
-  });
-
-  spawnGitLog.stderr.on('data', function (data) {
-    console.log('Err: ' + data);
-    return callback(data);
-  });
-
-  spawnGitLog.on('close', function (code) {
-    var developLogArr = logInfoToJson(developLog);
-
-    return callback(null, developLogArr);
-  });
-}
-
-function fetchLogWithoutFeatureBranch() {
-  spawnDevelopLog.stdout.on('data', function (data) {
-    logWithoutFeature += data;
-  });
-
-  spawnDevelopLog.stderr.on('data', function (data) {
-    console.log('Err: ' + data);
-  });
-
-  spawnDevelopLog.on('close', function (code) {
-    var logWithoutFeatureArr = logInfoToJson(logWithoutFeature);
-
-    console.log(logWithoutFeatureArr);
-    console.log('exit : ' + code);
-  });
-
-}
-
-function logInfoToJson(logStr) {
-  var logArr = logStr.split(/\n/);
-
-  //FIXME 가끔가다 JSON Parse err occured. 
-  if (logArr.length > 0) {
-    var resultArr = [];
-    for (var i=0, li = logArr.length; i < li; i++) {
-      logArr[i].replace(/'/, '');
-      console.log('errrr', logArr[i]);
-      resultArr[i] = JSON.parse(logArr[i]);
-    }
-
-    return resultArr;
-  } else {
-    return null;
-  }
-}
