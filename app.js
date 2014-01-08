@@ -12,6 +12,7 @@ var abar = require('address_bar');
 var folder_view = require('folder_view');
 var path = require('path');
 var shell = require('nw.gui').Shell;
+var step = require('step');
 var Datastore = require('nedb');
 var path = require('path')
 var db = new Datastore({ filename: path.join(require('nw.gui').App.dataPath, 'list.db') });
@@ -24,11 +25,6 @@ $(document).ready(function() {
   });
 
   addRepository(jQuery);
-
-  jQuery("#delRepo").on('click', function () {
-    //dir list 목록 보여주는 popup 보여주자
-    
-  });
 
 });
 
@@ -46,14 +42,53 @@ function loadRepositoryList(jQuery, callback) {
     + "<button class='btn btn-mini'><i class='icon-minus'></i></button></a></li>";
       jQuery("div.well ul.nav-list li.divider").before(liElement);
       // 삭제 버튼에 이벤트 달기
-      triggerDeleteRepositoryEvenet(jQuery);
+      // a[value=]이용해서 달자.
+    triggerDeleteRepositoryEvenet(jQuery, docs[i].path, docs[i].name);
     }
     return callback(null);   
   });
 }
 
-function triggerDeleteRepositoryEvenet() {
-  console.log('aaa');
+function triggerDiplasyLogOnRepositoryEvenet(jQuery, gitDirPath, name) {
+
+  fetchDevelopLog(gitDirPath, function (err, logArr) {
+    if (err) {
+      console.log('display log err', err);
+    }
+
+    console.log('view', logArr);
+  });
+}
+
+function triggerDeleteRepositoryEvenet(jQuery, value, name) {
+  jQuery("a[value='" + value + "'] i.icon-minus").on('click', function () {
+    //delete data on db;
+    db.find({'name' : name} , function (err, docs) {
+      if (err) {
+        console.log(err);
+      }
+      if (docs.length == 0) {
+        return null;
+      }
+      
+      step(
+        function () {
+          var group = this.group();
+
+          for (var i = 0, li = docs.length; i < li; i++) {
+            db.remove({_id: docs[i]._id}, {}, group());
+          }
+        }, function (err, datas) {
+          if (err) {
+            console.log('Delete err', err);
+          }
+          
+          loadRepositoryList(jQuery, function (err) {
+          });
+        }
+        );
+    });
+  });
 }
 
 function addRepository(jQuery) {
@@ -92,7 +127,6 @@ function addRepository(jQuery) {
                   console.log(err);
                 }
 
-                console.log('insert result', newDoc);
                 loadRepositoryList(jQuery, function (err) {
                 });
               });
@@ -100,14 +134,16 @@ function addRepository(jQuery) {
           });
         } else {
           //alert 이 디렉토리는 git dir이 아니거나 git root dir이 아닙니다. .git을 찾을 수 없습니다.
+          alert("This Directory is not git repository. Can't find .git!");
         }
         
-        fetchDevelopLog(gitDirPath);
+
       });
 
     });
   });
 }
+
 
 function fetchAbsolutePath(fileList) {
  var path = null;
@@ -132,7 +168,7 @@ var spawnDevelopLog = spawn("git", ["log", "--first-parent", "--author=" + autho
 var spawnGitLogWithDuration = spawn("git", ["log", "--since=" + sinceDate, "--until=" + untilDate, "--author=" + author, "--pretty=format:{\"message\": \"%s\", \"date\": \"%ad\"}"], [{cwd : workingDirPath}]);
 var spawnGitLogForTeamMeeting = spawn("git", ["log", "--since=1.weeks", "--author=" + author, "--pretty=format:{\"message\": \"%s\", \"date\": \"%ad\"}"], [{cwd : workingDirPath}]);
 
-function fetchDevelopLog(gitDirPath) {
+function fetchDevelopLog(gitDirPath, callback) {
   var spawnGitLog = spawn("git", ["log", "--author=" + author, "--pretty=format:{\"message\": \"%s\", \"date\": \"%ad\"}"], [{cwd : gitDirPath}]);
   spawnGitLog.stdout.on('data', function (data) {
     developLog += data;
@@ -140,12 +176,13 @@ function fetchDevelopLog(gitDirPath) {
 
   spawnGitLog.stderr.on('data', function (data) {
     console.log('Err: ' + data);
+    return callback(data);
   });
 
   spawnGitLog.on('close', function (code) {
     var developLogArr = logInfoToJson(developLog);
 
-    console.log('exit : ' + code);
+    return callback(null, developLogArr);
   });
 }
 
@@ -170,13 +207,16 @@ function fetchLogWithoutFeatureBranch() {
 function logInfoToJson(logStr) {
   var logArr = logStr.split(/\n/);
 
+  //FIXME 가끔가다 JSON Parse err occured. 
   if (logArr.length > 0) {
+    var resultArr = [];
     for (var i=0, li = logArr.length; i < li; i++) {
       logArr[i].replace(/'/, '');
-      logArr[i] = JSON.parse(logArr[i]);
+      console.log('errrr', logArr[i]);
+      resultArr[i] = JSON.parse(logArr[i]);
     }
 
-    return logArr;
+    return resultArr;
   } else {
     return null;
   }

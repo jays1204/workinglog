@@ -6,14 +6,23 @@
 <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
 <link href="style.css" rel="stylesheet">
 <script type="text/javascript" src="js/jquery-1.7.2.js"></script>
-<script type="text/javascript" src="main.js"></script>
 <script type="text/javascript" src="app.js"></script>
+<script>
+  var Gaze = require('gaze').Gaze;
+  var gaze = new Gaze(['./*.js', './*.html']);
+
+  gaze.on('all', function (event, filepath) {
+    if (location)
+    location.reload();
+  });
+</script>
 </head>
 <body>
 <div style="position: absolute; left: 10px; right: 10px; top: 10px; bottom: 10px;">
   <div class="well" style="width: 160px; padding: 8px;">
     <ul class="nav nav-list">
       <li class="nav-header">Repository List</li>
+      <li class="dirList"><a href="#" value="/Users/skplanet/project/privateProject/recomics"><i class="icon-book"></i>test<button class="btn btn-mini"><i class="icon-minus"></i></button></a></li>
       <li class="divider"></li>
       <li><a href="#"><i class="icon-flag"></i> About</a></li>
     </ul>
@@ -24,7 +33,6 @@
     <div class="btn-group">
       <input type="file" id="addRepoInput" webkitdirectory directory multiple style="visibility: hidden; display: block; width: 0; height: 0;"/>
       <button type-"button" class="btn btn-default" id="addRepo">Add</button>
-      <button type-"button" class="btn btn-default" id="delRepo">Delete</button>
     </div>
   </div>
 
@@ -33,7 +41,8 @@
       <ul id="addressbar" class="breadcrumb"></ul>
     </div>
     <div class="row" style="background: #FFF; -webkit-border-radius: 2px; margin: -5px 1px 0 -19px; height: 100%; overflow: auto">
-      <ul style="margin: 5px;" id="files"></ul>
+      <ul style="margin: 5px;" id="myLog"></ul>
+      <!-- <ul style="margin: 5px;" id="files"></ul> -->
     </div>
     <div class="row">
       <input type="text" />
