@@ -103,8 +103,63 @@ function inputAuthorInfo(authorName) {
 
 }
 
+function triggerInitDbEvent(jQuery) {
+  jQuery("#initDbBtn").on('click', function () {
+    step(
+      function findAuthInfo() {
+        authorInfoDb.find({}, this)
+      },
+      function deleteAuthInfo(err, docs) {
+        if (err) {
+          alert("Init Config Info ERR: " + err);
+        }
+
+        if (docs.length === 0) {
+          alert("Information to delete not exist");
+
+          return;
+        }
+        
+        var group = this.group();
+        for (var i = 0, li = docs.length; i < li; i++) {
+          authorInfoDb.remove({"_id" : docs[i]._id}, {}, group());
+        }
+      },
+      function findRepoList(err) {
+        if (err) {
+          alert("Init Config Info ERR: " + err);
+        }
+
+        repoListDb.find({}, this);
+      },
+      function deleteRepoList(err, docs) {
+        if (err) {
+          alert("Init Config Info ERR: " + err);
+        }
+
+        if (docs.length === 0) {
+          alert("Information to delete not exist");
+
+          return;
+        }
+  
+        var gorup = this.group();
+        for (var i = 0, li = docs.length; i < li; i++) {
+          repoListDb.remove({"_id" : docs[i]._id}, {}, group());
+        }
+      },
+      function done(err) {
+        if (err) {
+          alert("Init Config Info ERR: " + err);
+        }
+
+        return;
+      }
+      );
+  });
+}
 function triggerEditAuthorInfoEvent(jQuery) {
-  jQuery("div.setInfo button").on('click', function () {
+  jQuery("#editInfoBtn").on('click', function () {
           jQuery("#editAuthorInfoModal").modal();
   });
 }
