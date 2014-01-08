@@ -1,6 +1,6 @@
 {
   "name": "WorkingLog",
-  "description": "Simple file explorer.",
+  "description": "Simple Working Logger",
   "main": "index.html",
   "window": {
     "toolbar": false,
