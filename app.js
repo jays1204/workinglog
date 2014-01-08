@@ -6,39 +6,167 @@ var shell = require('nw.gui').Shell;
 var step = require('step');
 var Datastore = require('nedb');
 var path = require('path')
-var db = new Datastore({ filename: path.join(require('nw.gui').App.dataPath, 'list.db') });
+var repoListDb = new Datastore({ filename: path.join(require('nw.gui').App.dataPath, 'list.db') });
+var authorInfoDb = new Datastore({filename : path.join(require('nw.gui').App.dataPath, 'author.db') });
+ 
 var logFetcher = require('./fetchGitLog.js');
-var author = "jays";
 
-var workingDirPath = "";
-var logWithoutFeature = "";
-var sinceDate = "2014-01-01";
-var untilDate = "2014-01-08";
+var author;//= "jays";
+var inputAuthorName;
 
 $(document).ready(function() {
   //init setting
   var jQuery = $;
-  db.loadDatabase();
+  authorInfoDb.loadDatabase();
+  repoListDb.loadDatabase();
+  triggerEditAuthorInfoEvent(jQuery);
+  triggerEditAuthorInfoModalEvent(jQuery);
+  triggerInputAuthorInfoEvent(jQuery);
 
+  step(
+    function () {
+      loadAuthorInfo(jQuery, this);
+    },
+    function getRepoList(err, runLoadRepository) {
+      if (err) {
+        alert(err);
+      }
 
-  loadRepositoryList(jQuery, function (err) {
-  });
+      if (runLoadRepository === true) {
+        loadRepositoryList(jQuery, this);
+      } else {
+        return;
+      }
+    },
+    function done(err) {
+      if (err) {
+        alert(err);
+      }
+    }
+    );
 
   addRepository(jQuery);
 
 });
 
-function loadRepositoryList(jQuery, callback) {
+function parsingAuthinfoOnGitConfig(callback) {
+  fs.readFile(getUserHome() + "/.gitconfig", {encoding: "utf-8"}, function (err, data) {
+    if (err) {
+      return callback(err);
+    }
+
+    var nameStrOnConfig = data.match(/name[ \t]*=[ \t]*[a-zA-Z0-9]+\n/);
+    if (nameStrOnConfig === null) {
+      return callback("Check Your name on gitconfig(path: ~/.gitconfig)");
+    }
+
+    var configuredName = nameStrOnConfig[0].split("=")[1].replace(" ", "").replace(/\n/, "");
+    return callback(null, configuredName);
+  });
+}
+
+function inputAuthorInfo(authorName) {
+  jQuery("#inputAuthorInfoModal").modal("hide");
+  jQuery("#editAuthorInfoModal").modal("hide");
+  if (authorName === null) {
+
+  }
+
   step(
-      function getAuthorName() {
-        db.findOne({'author' : true}, this);
-      }, function findRepositoryList(err, doc) {
+      function getHomeGitConfig() {
+        parsingAuthinfoOnGitConfig(this);
+      }, 
+      function compareGitConfigAuthorValue(err, configuredName) {
+        if (err) {
+          alert("Read ~/.gitconfig ERR: " + err);
+        }
+
+        if (authorName != configuredName) {
+          alert("It doesn't match input name with configure name");
+        }
+
+        authorInfoDb.insert({"author" : true, "authorName" : authorName}, this);
+      },
+      function loadRepoList(err, newDoc) {
+        if (err) {
+          alert('authorInfo insert ERR: ' + err);
+        }
+
+        author = authorName;
+        loadRepositoryList(jQuery, function (err) {
+          if (err) {
+            alert(err);
+          }
+        });
+      }
+  );
+
+}
+
+function triggerEditAuthorInfoEvent(jQuery) {
+  jQuery("div.setInfo button").on('click', function () {
+          jQuery("#editAuthorInfoModal").modal();
+  });
+}
+
+function triggerInputAuthorInfoEvent(jQuery) {
+  jQuery("#inputAuthorInfoModal div.modal-footer button[type='submit']").on('click', function () {
+    inputAuthorName = jQuery("#inputAuthorInfoModal div.modal-body form input").val();
+    inputAuthorInfo(inputAuthorName);
+  });
+}
+
+function triggerEditAuthorInfoModalEvent(jQuery) {
+  jQuery("#editAuthorInfoModal div.modal-footer button[type='submit']").on('click', function () {
+
+    step(
+      function getInfo() {
+        authorInfoDb.findOne({}, this);
+        }, 
+        function removePreAuthorInfo(err, doc) {
+          if (err) {
+            alert("author info find ERR: " + err);
+          }
+          
+          authorInfoDb.remove({"_id" : doc._id}, {}, this);
+        }, 
+        function (err, datas) {
+          if (err) {
+            alert("Edit Author Info ERR: " + err);
+          }
+          
+          var editedAuthorName = jQuery("#editAuthorInfoModal div.modal-body form input").val();
+          inputAuthorInfo(editedAuthorName);
+
+        }
+      );
+  });
+}
+
+function loadAuthorInfo(jQuery, callback) {
+  step(
+      function getAuthorInfo() {
+        authorInfoDb.findOne({'author' : true}, this);
+      }, function (err, doc) {
         if (err) {
           return callback(err);
         }
-        //author이름 없으면 입력 받고 저장.
+        if (doc === null) {
+          jQuery("#inputAuthorInfoModal").modal();
 
-        db.find({}, this);
+          return callback(null, false);
+        } else {
+          author = doc.authorName;
+          return callback(null, true);
+        }
+      }
+      );
+}
+
+function loadRepositoryList(jQuery, callback) {
+  step(
+      function() {
+        repoListDb.find({}, this);
       }, function displayRepositoryList(err, docs) {
         if (err) {
           return callback(err);
@@ -66,6 +194,7 @@ function triggerDiplasyLogOnRepositoryEvenet(jQuery, gitDirPath, name) {
     jQuery("#addressbar li").remove();
     jQuery("#addressbar").append("<li>" + name + "</li>");
 
+    console.log('llllll:' , author);
     jQuery("div.row table.table tbody tr").remove();
     logFetcher.developLog(gitDirPath, author, function (err, logArr) {
       if (err) {
@@ -87,7 +216,7 @@ function triggerDiplasyLogOnRepositoryEvenet(jQuery, gitDirPath, name) {
 function triggerDeleteRepositoryEvenet(jQuery, value, name) {
   jQuery("a[value='" + value + "']").next().on('click', function () {
     //delete data on db;
-    db.find({'name' : name} , function (err, docs) {
+    repoListDb.find({'name' : name} , function (err, docs) {
       if (err) {
         console.log(err);
       }
@@ -100,7 +229,7 @@ function triggerDeleteRepositoryEvenet(jQuery, value, name) {
           var group = this.group();
 
           for (var i = 0, li = docs.length; i < li; i++) {
-            db.remove({_id: docs[i]._id}, {}, group());
+            repoListDb.remove({_id: docs[i]._id}, {}, group());
           }
         }, function (err, datas) {
           if (err) {
@@ -140,13 +269,13 @@ function addRepository(jQuery) {
             path : gitDirPath
           };
 
-          db.find({"path": gitDirPath}, function (err, docs) {
+          repoListDb.find({"path": gitDirPath}, function (err, docs) {
             if (err) {
               console.log('err', err);
             }
 
             if (docs.length === 0) {
-              db.insert(gitDirPathInfo, function (err, newDoc) {
+              repoListDb.insert(gitDirPathInfo, function (err, newDoc) {
                 if (err) {
                   console.log(err);
                 }
@@ -184,4 +313,7 @@ function fetchAbsolutePath(fileList) {
  return path;
 }
 
+function getUserHome() {
+  return process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+}
 

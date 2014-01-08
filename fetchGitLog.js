@@ -45,7 +45,6 @@ function fetchLogForOneWeek(gitDirPath, author, callback) {
 function logInfoToJson(logStr) {
   var logArr = logStr.split(/\n/);
 
-  //FIXME 가끔가다 JSON Parse err occured. 
   if (logArr.length > 0) {
     var resultArr = [];
     for (var i=0, li = logArr.length; i < li; i++) {

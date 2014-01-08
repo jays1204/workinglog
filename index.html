@@ -6,6 +6,7 @@
 <link href="bootstrap/css/bootstrap.css" rel="stylesheet">
 <link href="style.css" rel="stylesheet">
 <script type="text/javascript" src="js/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="app.js"></script>
 <script>
   var Gaze = require('gaze').Gaze;
@@ -36,11 +37,15 @@
     </div>
   </div>
 
-  <div class="setDuration" style="float: left; width: 160px; padding: 8px;">
+  <div class="setDuration" style="width: 160px; padding: 8px;">
     <h5>Set Duration</h5>
     <div class="btn-group">
       <button class="btn btn-default">Entire</button>
     </div>
+  </div>
+  <div class="setInfo" style="float: left; width: 160px; padding: 8px;">
+    <h5>Set Author Info</h5>
+    <button class="btn btn-default">Set Info</button>
   </div>
 
   <div style="float: left; position: absolute; left: 210px; right: 0; top: 0; bottom: 50px">
@@ -69,5 +74,39 @@
     </div>
   </div>
 </div>
+
+<div id="inputAuthorInfoModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+    <h3>VCS Author Name Not Exist!</h3>
+  </div>
+  <div class="modal-body">
+    <form>
+      <label>Input Your Authour name</label>
+      <input type="text" name="authorName" placeholder="Type VCS Author name" />
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary" type="submit">Submit</button>
+  </div>
+</div>
+<div id="editAuthorInfoModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+    <h3>Edit Author Name</h3>
+  </div>
+  <div class="modal-body">
+    <form>
+      <label>Input Your Authour name</label>
+      <input type="text" name="authorName" placeholder="Type VCS Author name" />
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary" type="submit">Submit</button>
+  </div>
+</div>
+
 </body>
 </html>
