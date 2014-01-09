@@ -51,7 +51,21 @@
 
   <div style="float: left; position: absolute; left: 210px; right: 0; top: 0; bottom: 50px">
     <div class="row">
-      <ul id="addressbar" class="breadcrumb"></ul>
+      <ul id="addressbar" class="breadcrumb" style="display: -webkit-box;">
+        <li><p>Not Selected</p></li>
+        <li>
+        <div class="btn-group">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            Sort By Date
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a href="#" value="Desc">Desc</a></li>
+            <li><a href="#" value="Asc">Asc</a></li>
+          </ul>
+        </div>
+        </li>
+      </ul>
     </div>
     <div class="row" style="background: #FFF; -webkit-border-radius: 2px; margin: -5px 1px 0 -19px; height: 100%; overflow: auto">
       <ul style="margin: 5px;" id="myLog"></ul>
@@ -106,6 +120,19 @@
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
     <button class="btn btn-primary" type="submit">Submit</button>
+  </div>
+</div>
+<div id="initConfigurationModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"><i class="icon-remove"></i></button>
+    <h3>Init Configuration</h3>
+  </div>
+  <div class="modal-body">
+    <p>Do you want to init configuration information really?</p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+    <button class="btn btn-primary" type="submit">Ok</button>
   </div>
 </div>
 

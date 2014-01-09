@@ -13,12 +13,17 @@ var logFetcher = require('./fetchGitLog.js');
 
 var author;//= "jays";
 var inputAuthorName;
+var duration = {
+  
+};
 
 $(document).ready(function() {
   //init setting
   var jQuery = $;
   authorInfoDb.loadDatabase();
   repoListDb.loadDatabase();
+  
+  triggerInitDbModalEvent(jQuery);
   triggerEditAuthorInfoEvent(jQuery);
   triggerEditAuthorInfoModalEvent(jQuery);
   triggerInputAuthorInfoEvent(jQuery);
@@ -104,7 +109,7 @@ function inputAuthorInfo(authorName) {
 }
 
 function triggerInitDbEvent(jQuery) {
-  jQuery("#initDbBtn").on('click', function () {
+  jQuery("#initConfigurationModal div.modal-footer button[type='submit']").on('click', function () {
     step(
       function findAuthInfo() {
         authorInfoDb.find({}, this)
@@ -143,7 +148,7 @@ function triggerInitDbEvent(jQuery) {
           return;
         }
   
-        var gorup = this.group();
+        var group = this.group();
         for (var i = 0, li = docs.length; i < li; i++) {
           repoListDb.remove({"_id" : docs[i]._id}, {}, group());
         }
@@ -156,6 +161,15 @@ function triggerInitDbEvent(jQuery) {
         return;
       }
       );
+
+  });
+}
+function triggerInitDbModalEvent(jQuery) {
+  jQuery("#initConfigurationModal div.modal-footer button[data-dismiss='modal']").on('click', function () {
+    jQuery("#initConfigurationModal").modal('hide');
+  });
+  jQuery("#initDbBtn").on('click', function () {
+    jQuery("#initConfigurationModal").modal();
   });
 }
 function triggerEditAuthorInfoEvent(jQuery) {
@@ -246,10 +260,9 @@ function loadRepositoryList(jQuery, callback) {
 
 function triggerDiplasyLogOnRepositoryEvenet(jQuery, gitDirPath, name) {
   jQuery("a[value='" + gitDirPath + "']").on('click', function () {
-    jQuery("#addressbar li").remove();
-    jQuery("#addressbar").append("<li>" + name + "</li>");
+    jQuery("#addressbar li p").remove();
+    jQuery("#addressbar li").prepend("<p>" + name + "</p>");
 
-    console.log('llllll:' , author);
     jQuery("div.row table.table tbody tr").remove();
     logFetcher.developLog(gitDirPath, author, function (err, logArr) {
       if (err) {
