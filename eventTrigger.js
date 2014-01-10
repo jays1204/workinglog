@@ -9,9 +9,9 @@ var alertMsg = global.settings.alertMsg;
 
 //display all my local git repository log list
 function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
-  jQuery("#addressbar li p").remove();
+  removeRepositoryNameOnAddressBar(jQuery);
   jQuery("div.row table.table tbody tr").remove();
- 
+
   if (infoArr.length === 0) {
     //err handling
   }
@@ -25,6 +25,7 @@ function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
           return err;
         }
 
+        global.settings.selected = infoArr;
         var group = this.group();
 
         for (var i = 0, li = infoArr.length; i < li; i++) {
@@ -52,12 +53,23 @@ function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
       );
 }
 
+function removeRepositoryNameOnAddressBar(jQuery) {
+    jQuery("#selectedProjectName p").remove();
+}
+
 function triggerDisplayLogOnSpecificRepositoryEvent(jQuery, gitDir) {
   jQuery("a[value='" + gitDir.path + "']").on('click', function () {
-    jQuery("#addressbar li p").remove();
-    jQuery("#addressbar li").prepend("<p>" + gitDir.name + "</p>");
+    global.settings.selected = [gitDir];
 
-    step(
+    removeRepositoryNameOnAddressBar(jQuery);
+    jQuery("#selectedProjectName").prepend('<p><button type="button" class="btn btn-large btn-primary" disabled>' + gitDir.name + '</button></p>');
+
+    renderSpecificRepositoryLog(jQuery, gitDir, {"desc" : true});
+  });
+}
+
+function renderSpecificRepositoryLog(jQuery, gitDir, sortOption) {
+  step(
       function selectAuthorInfo() {
         authorInfoDb.findOne({'author' : true}, this);
       },
@@ -65,7 +77,7 @@ function triggerDisplayLogOnSpecificRepositoryEvent(jQuery, gitDir) {
         if (err) {
           return err;
         }
-      
+
         logFetcher.developLog(gitDir, doc.authorName, this);
       },
       function done(err, logInfo) {
@@ -83,13 +95,15 @@ function triggerDisplayLogOnSpecificRepositoryEvent(jQuery, gitDir) {
         jQuery("div.row table.table thead tr").remove();
         jQuery("div.row table.table thead").append(tableHeadRowElement);
         jQuery("div.row table.table tbody tr").remove();
+
+        logInfo.logArr = utilLibs.sortByOption(logInfo.logArr, sortOption.desc);
+
         for (var i = 0, li = logInfo.logArr.length; i < li; i++) {
           var trElement = utilLibs.createTableBodyRowElement(logInfo.logArr[i]);
           jQuery("div.row table.table tbody").append(trElement);
         }
       }
-      );
-  });
+  );
 }
 
 function triggerDeleteRepositoryEvent(jQuery, value, name) {
@@ -130,7 +144,7 @@ function triggerAddRepositoryEvent(jQuery) {
 function triggerDisplayRepositoryListEvent(jQuery, docs) {
   jQuery("div.well ul.nav-list li.dirList").remove();
 
-    triggerDefaultDisplayLogEvent(jQuery, docs, {"desc": true});
+  triggerDefaultDisplayLogEvent(jQuery, docs, {"desc": true});
   //insert repository element and trigger display and  delete event
   for (var i = 0, li = docs.length; i < li; i++) {
     var liElement = "<li class='dirList' style='display: -webkit-inline-box;'><a href='#' value='" + docs[i].path + "'><i class='icon-book'></i>" + docs[i].name 
@@ -142,8 +156,33 @@ function triggerDisplayRepositoryListEvent(jQuery, docs) {
   }
 }
 
+function triggerSortByDateEvent(jQuery) {
+  jQuery("#addressbar div.btn-group ul.dropdown-menu li a[value=Desc]").on('click', function () {
+    //sort by desc
+    var selectedGitRepoItem = global.settings.selected;
+    if (selectedGitRepoItem.length === 1) {
+      renderSpecificRepositoryLog(jQuery, selectedGitRepoItem[0], {"desc" : true});
+    } else {
+      triggerDefaultDisplayLogEvent(jQuery, selectedGitRepoItem, {"desc": true});
+    }
+  });
+
+  jQuery("#addressbar div.btn-group ul.dropdown-menu li a[value=Asc]").on('click', function () {
+    var selectedGitRepoItem = global.settings.selected;
+    if (selectedGitRepoItem.length === 1) {
+      console.log('hihihi asc');
+      renderSpecificRepositoryLog(jQuery, selectedGitRepoItem[0], {"desc" : false});
+    } else {
+      triggerDefaultDisplayLogEvent(jQuery, selectedGitRepoItem, {"desc": false});
+    }
+
+  });
+}
+
 
 module.exports.displasyLogOnSpecificRepository = triggerDisplayLogOnSpecificRepositoryEvent;
 module.exports.deleteRepository = triggerDeleteRepositoryEvent;
 module.exports.addRepository = triggerAddRepositoryEvent;
 module.exports.displayRepositoryList = triggerDisplayRepositoryListEvent;
+
+module.exports.sortByDate = triggerSortByDateEvent;

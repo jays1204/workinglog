@@ -70,7 +70,29 @@ function sortAndMergeLogList(repositoryInfoArr, isDesc) {
     concatArr = concatArr.concat(repositoryInfoArr[i].logArr);
   }
  
+  /*
   //sort by option
+  if (isDesc === true) {
+    concatArr.sort(function (a,b) {
+      a = new Date(a.date);
+      b = new Date(b.date);
+
+      return a > b ? -1 : a < b ? 1 : 0;
+    });
+  } else {
+    concatArr.sort(function (a,b) {
+      a = new Date(a.date);
+      b = new Date(b.date);
+
+      return a < b ? -1 : a > b ? 1 : 0;
+    });
+  }
+*/
+  return sortByOption(concatArr, isDesc);;
+}
+
+//sort by option
+function sortByOption(concatArr, isDesc) {
   if (isDesc === true) {
     concatArr.sort(function (a,b) {
       a = new Date(a.date);
@@ -118,3 +140,4 @@ module.exports.fetchAbsolutePath = fetchAbsolutePath;
 module.exports.sortAndMergeLogList = sortAndMergeLogList;
 module.exports.createTableHeadRowElement = createTableHeadRowElement;
 module.exports.createTableBodyRowElement = createTableBodyRowElement;
+module.exports.sortByOption = sortByOption;
