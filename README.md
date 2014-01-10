@@ -15,5 +15,6 @@ version : 0.1
       
           
   See this page : https://github.com/rogerwang/node-webkit
-  - Second
+
+- Second
   - Run this Command :  $ node-webkit ./workingLog
