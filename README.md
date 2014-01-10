@@ -1,6 +1,8 @@
 # Working Logger
 Check Your repository logs without other commiter.
 
+version : 0.1
+
 # Feature
 - You can see VCS log about specific user(me or other user).
 - Enable set duration(will be...)
