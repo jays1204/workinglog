@@ -24,7 +24,6 @@ var repositories = require('./repositories.js');
 var logFetcher = require('./fetchGitLog.js');
 
 var author = global.settings.author;
-//var author;//= "jays";
 var inputAuthorName;
 var duration = {
   
@@ -114,6 +113,7 @@ function loadAuthorInfo(jQuery, callback) {
           return callback(null, false);
         } else {
           author = doc.authorName;
+          global.settings.author = author;
           return callback(null, true);
         }
       }

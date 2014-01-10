@@ -13,8 +13,11 @@
   var gaze = new Gaze(['./*.js', './*.html']);
 
   gaze.on('all', function (event, filepath) {
-    if (location)
-    location.reload();
+    if (location) {
+      event === "changed" ? console.log(filepath + " is changed") : null;
+      //Assign true value at reload option. This stop Cache.
+      location.reload(true);
+    }
   });
 </script>
 </head>
@@ -71,17 +74,9 @@
       <ul style="margin: 5px;" id="myLog"></ul>
       <table class="table table-striped table-boardered table-hover">
         <thead>
-          <tr>
-            <th>Commit Hash</th>
-            <th>Commit Message</th>
-            <th>Date</th>
-          </tr>
         </thead>
         <tbody>
           <tr>  
-            <td>a</td>
-            <td>b</td>
-            <td>c</td>
           </tr>
         </tbody>
       </table>

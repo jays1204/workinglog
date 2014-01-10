@@ -24,10 +24,11 @@ function _fetchDevelopLog(gitDirPath, author, callback) {
 }
 
 // handling with double quote, quote is so hard. So multiple call git commnad 
-function fetchDevelopLog(gitDirPath, author, callback) {
+function fetchDevelopLog(gitDir, author, callback) {
   var logMsg;
   var logDate;
   var logHash;
+  var gitDirPath = gitDir.path;
 
   step(
     function msg() {
@@ -68,9 +69,12 @@ function fetchDevelopLog(gitDirPath, author, callback) {
           };
         }
 
-        //3개를 조합해서 하나로 만들자.
-        //logInfoToJson();
-        return callback(null, resultArr);
+        var result = {
+          "repositoryName" : gitDir.name,
+          "logArr" : resultArr
+        };
+
+        return callback(null, result);
       } else {
         return callback("fetch Log ERR : Match list count");
       }
@@ -97,7 +101,6 @@ function fetchDevelopMsg(gitDirPath, author, callback) {
 
     for (var i = 0, li = logMsgArr.length; i < li; i++) {
       logMsgArr[i] = logMsgArr[i].replace(/"/g, '\\"').replace(/'/g, "\\'");
-      console.log(i, logMsgArr[i]);
     }
 
     return callback(null, logMsgArr);
@@ -170,22 +173,9 @@ function fetchLogForOneWeek(gitDirPath, author, callback) {
 function logInfoToJson(logStr) {
   var logArr = logStr.split(/\n/);
 
-  //FIXME 중간 중간 쿼테이션이 계속 들어가거나 해서 에러난다.
-  //아무래도 message따로 date 따로 받아서 합치는게 나을거 같다. 
   if (logArr.length > 0) {
     var resultArr = [];
     for (var i=0, li = logArr.length; i < li; i++) {
-      /*
-      var quoteInquoteStr = logArr[i].match(/:\"[a-zA-Z0-9가-힣, *\"[a-zA-Z0-9가-힣, ]*\"]*\"/);
-      console.log(logArr[i]);
-      if (quoteInquoteStr != null) {  
-        console.log(quoteInquoteStr);
-        var strWitoutQinq = quoteInquoteStr[0].replace(/\"/g, "").replace(/:/, ':"');
-        console.log(strWitoutQinq);
-        logArr[i] = logArr[i].replace(quoteInquoteStr, strWitoutQinq);
-      }
-      */
-      console.log(i, logArr[i]);
       resultArr[i] = JSON.parse(logArr[i]);
     }
 

@@ -56,6 +56,65 @@ function fetchAbsolutePath(fileList) {
  return path;
 }
 
+//default desc
+function sortAndMergeLogList(repositoryInfoArr, isDesc) {
+  if (repositoryInfoArr.length === 0) {
+    return "ERR : ";
+  }
+  var concatArr = []; 
+
+  for (var i = 0, li = repositoryInfoArr.length; i < li; i++) {
+    for (var j = 0, lj = repositoryInfoArr[i].logArr.length; j < lj; j++) {
+      repositoryInfoArr[i].logArr[j].repositoryName = repositoryInfoArr[i].repositoryName;
+    }
+    concatArr = concatArr.concat(repositoryInfoArr[i].logArr);
+  }
+ 
+  //sort by option
+  if (isDesc === true) {
+    concatArr.sort(function (a,b) {
+      a = new Date(a.date);
+      b = new Date(b.date);
+
+      return a > b ? -1 : a < b ? 1 : 0;
+    });
+  } else {
+    concatArr.sort(function (a,b) {
+      a = new Date(a.date);
+      b = new Date(b.date);
+
+      return a < b ? -1 : a > b ? 1 : 0;
+    });
+  }
+
+  return concatArr;
+}
+
+function createTableHeadRowElement(log) {
+  var tableHeadRowElement = "<tr>";
+  for (var key in log) {
+    tableHeadRowElement += ("<th>" + key + "</th>");
+  }
+  tableHeadRowElement += "</tr>";
+
+  return tableHeadRowElement;
+}
+
+function createTableBodyRowElement(log) {
+  var tableBodyRowElement = "<tr>";
+
+  for (var key in log) {
+    tableBodyRowElement += ("<td>" + log[key] + "</td>");
+  }
+  tableBodyRowElement += "</tr>";
+
+  return tableBodyRowElement;
+}
+
+
 module.exports.parsingAuthinfoOnGitConfig = parsingAuthinfoOnGitConfig;
 module.exports.getUserHome = getUserHome;
 module.exports.fetchAbsolutePath = fetchAbsolutePath;
+module.exports.sortAndMergeLogList = sortAndMergeLogList;
+module.exports.createTableHeadRowElement = createTableHeadRowElement;
+module.exports.createTableBodyRowElement = createTableBodyRowElement;
