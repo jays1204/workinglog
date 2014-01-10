@@ -179,6 +179,24 @@ function triggerSortByDateEvent(jQuery) {
   });
 }
 
+function triggerShowAllEvent(jQuery) {
+  jQuery("#addressbar li button").on('click', function () {
+    step(
+      function selectRepositoryList() {
+        repoListDb.find({}, this);
+      },
+      function done(err, docs) {
+        if (err) {
+          console.log(err);
+          return;
+        }
+
+        triggerDefaultDisplayLogEvent(jQuery, docs, {"desc": true});
+      }
+      );
+  });
+}
+
 
 module.exports.displasyLogOnSpecificRepository = triggerDisplayLogOnSpecificRepositoryEvent;
 module.exports.deleteRepository = triggerDeleteRepositoryEvent;
@@ -186,3 +204,4 @@ module.exports.addRepository = triggerAddRepositoryEvent;
 module.exports.displayRepositoryList = triggerDisplayRepositoryListEvent;
 
 module.exports.sortByDate = triggerSortByDateEvent;
+module.exports.showAllBtn = triggerShowAllEvent;

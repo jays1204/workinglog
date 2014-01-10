@@ -38,6 +38,7 @@ $(document).ready(function() {
   triggerEditAuthorInfoModalEvent(jQuery);
   triggerInputAuthorInfoEvent(jQuery);
   eventTrigger.sortByDate(jQuery);
+  eventTrigger.showAllBtn(jQuery);
 
   step(
     function () {
