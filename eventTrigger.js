@@ -5,6 +5,10 @@ var author = global.settings.author;
 var repoListDb = global.settings.repoListDb;
 var alertMsg = global.settings.alertMsg;
 
+function triggerDefaultDisplayLogEvent(jQuery, gitDirPath, name) {
+
+}
+
 function triggerDisplasyLogOnRepositoryEvent(jQuery, gitDirPath, name) {
   jQuery("a[value='" + gitDirPath + "']").on('click', function () {
     jQuery("#addressbar li p").remove();

@@ -120,17 +120,3 @@ function loadAuthorInfo(jQuery, callback) {
       );
 }
 
-
-function triggerDisplasyLogOnRepositoryEvent(jQuery, gitDirPath, name) {
-  jQuery("a[value='" + gitDirPath + "']").on('click', function () {
-    eventTrigger.displasyLogOnRepository(jQuery, docs[i].path, docs[i].name);
-  });
-}
-
-
-function triggerDeleteRepositoryEvent(jQuery, value, name) {
-  jQuery("a[value='" + value + "']").next().on('click', function () {
-    eventTrigger.deleteRepository(jQuery, docs[i].path, docs[i].name);
-  });
-}
-
