@@ -7,6 +7,7 @@ var repoListDb = global.settings.repoListDb;
 var authorInfoDb = global.settings.authorInfoDb;
 var alertMsg = global.settings.alertMsg;
 
+//alertMsg("HIHIHI");
 //display all my local git repository log list
 function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
   removeRepositoryNameOnAddressBar(jQuery);
@@ -196,7 +197,6 @@ function triggerShowAllEvent(jQuery) {
       );
   });
 }
-
 
 module.exports.displasyLogOnSpecificRepository = triggerDisplayLogOnSpecificRepositoryEvent;
 module.exports.deleteRepository = triggerDeleteRepositoryEvent;

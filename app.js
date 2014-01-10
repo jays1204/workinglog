@@ -22,7 +22,6 @@ var utilLibs = require('./utils.js');
 var eventTrigger = require('./eventTrigger.js');
 var repositories = require('./repositories.js'); 
 var logFetcher = require('./fetchGitLog.js');
-
 var author = global.settings.author;
 var inputAuthorName;
 var duration = {
