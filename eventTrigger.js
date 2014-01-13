@@ -1,4 +1,4 @@
-var logFetcher = require('./fetchGitLog.js');
+var logFetcher = require('./fetchGitLog.js').developLog;
 var repositories = require('./repositories.js');
 var utilLibs = require('./utils.js');
 var step = require('step'); 
@@ -30,7 +30,7 @@ function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
         var group = this.group();
 
         for (var i = 0, li = infoArr.length; i < li; i++) {
-          logFetcher.developLog(infoArr[i], doc.authorName, group());
+          logFetcher(infoArr[i], doc.authorName, group());
         }
     },
     function done(err, data) {
@@ -91,12 +91,13 @@ function renderSpecificRepositoryLog(jQuery, gitDir, sortOption) {
           return err;
         }
 
-        logFetcher.developLog(gitDir, doc.authorName, this);
+        logFetcher(gitDir, doc.authorName, this);
       },
       function done(err, logInfo) {
         if (err) {
           //alertMsg('Fetch log ERR: ' + err);
           console.log(err);
+          return;
         }
 
         if (logInfo.logArr.length === 0) {
@@ -157,7 +158,7 @@ function triggerAddRepositoryEvent(jQuery) {
         console.log('add Repo', err);
           return;
         }
-        insertDirListElement(jQuery, dirInfo);
+        insertRepositoryElement(jQuery, dirInfo);
         triggerDisplayLogOnSpecificRepositoryEvent(jQuery, dirInfo);
       });
     });
@@ -165,19 +166,18 @@ function triggerAddRepositoryEvent(jQuery) {
 }
 
 function triggerDisplayRepositoryListEvent(jQuery, docs) {
-  //jQuery("div.well ul.nav-list li.dirList").remove();
   jQuery("div.well div.panel table.table tbody tr").remove();
 
   triggerDefaultDisplayLogEvent(jQuery, docs, {"desc": true});
   //insert repository element and trigger display and  delete event
   for (var i = 0, li = docs.length; i < li; i++) {
-    insertDirListElement(jQuery, docs[i]);
+    insertRepositoryElement(jQuery, docs[i]);
     triggerDisplayLogOnSpecificRepositoryEvent(jQuery, docs[i]);
     triggerDeleteRepositoryEvent(jQuery, docs[i].path, docs[i].name);
   }
 }
 
-function insertDirListElement(jQuery, doc) {
+function insertRepositoryElement(jQuery, doc) {
   var trElement = "<tr><td><a href='#' value='" + doc.path + "'><span class='glyphicon glyphicon-book' style='padding-right: 20px;'></span>" 
     + doc.name + "</a></td><td>" + "<button class='btn btn-default'><span class='glyphicon glyphicon-minus'></span></button>";
 
@@ -207,6 +207,15 @@ function triggerSortByDateEvent(jQuery) {
   });
 }
 
+function triggerSetDisplayLogWithDuration(jQuery) {
+  jQuery("#thisWeekBtn").on('click', function () {
+    logFetcher = require('./fetchGitLog.js').thisWeekLog; 
+  });
+  jQuery("#entireBtn").on('click', function () {
+    logFetcher = require('./fetchGitLog.js').developLog;
+  });
+}
+
 function triggerShowAllEvent(jQuery) {
   jQuery("#addressbar li button").on('click', function () {
     step(
@@ -229,6 +238,7 @@ module.exports.displasyLogOnSpecificRepository = triggerDisplayLogOnSpecificRepo
 module.exports.deleteRepository = triggerDeleteRepositoryEvent;
 module.exports.addRepository = triggerAddRepositoryEvent;
 module.exports.displayRepositoryList = triggerDisplayRepositoryListEvent;
+module.exports.setDuration = triggerSetDisplayLogWithDuration;
 
 module.exports.sortByDate = triggerSortByDateEvent;
 module.exports.showAllBtn = triggerShowAllEvent;

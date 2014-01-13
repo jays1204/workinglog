@@ -19,7 +19,7 @@
 <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="style.css" rel="stylesheet">
 <script type="text/javascript" src="js/jquery-1.7.2.js"></script>
-<script type="text/javascript" scr="js/jquery.fixedheadertable.min.js"></script>
+<script type="text/javascript" src="js/jquery.fixedheadertable.min.js"></script>
 <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="app.js"></script>
 </head>
@@ -54,7 +54,9 @@
   <div class="setDuration" style="width: 160px; padding: 8px;">
     <h5>Set Duration</h5>
     <div class="btn-group btn-group-sm">
-      <button class="btn btn-default">Entire</button>
+      <button class="btn btn-default" id="entireBtn">Entire</button>
+      <button class="btn btn-default" id="thisWeekBtn">ThisWeek</button>
+      <button class="btn btn-default">FromTo</button>
     </div>
   </div>
   <div class="setInfo" style="float: left; width: 160px; padding: 8px;">
@@ -154,4 +156,7 @@
 </div>
 
 </body>
+<script>
+//  $("div.well div.panel table.table").fixedHeaderTable('show');
+</script>
 </html>

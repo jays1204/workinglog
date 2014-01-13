@@ -38,6 +38,7 @@ $(document).ready(function() {
   triggerInputAuthorInfoEvent(jQuery);
   eventTrigger.sortByDate(jQuery);
   eventTrigger.showAllBtn(jQuery);
+  eventTrigger.setDuration(jQuery);
 
   step(
     function () {
