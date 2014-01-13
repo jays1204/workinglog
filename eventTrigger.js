@@ -49,6 +49,7 @@ function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
         var trElement = utilLibs.createTableBodyRowElement(result[i]);
         jQuery("div.row table.table tbody").append(trElement);
       }
+      jQuery("div.row table.table tbody").prepend("<tr><td>This week</td></tr>");
       return;
     }
       );

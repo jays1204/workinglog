@@ -123,16 +123,42 @@ function createTableHeadRowElement(log) {
 }
 
 function createTableBodyRowElement(log) {
-  var tableBodyRowElement = "<tr>";
+  var tableBodyRowElement = "";
 
+  var today = new Date();
+  var logDay = new Date(log.date);
+
+  if (today.getDay() === logDay.getDay()) {
+    var diffWeek = getDiffWeekWithToday(today, logDay);
+    tableBodyRowElement += "<tr><td>Before " + diffWeek + " weeks</td></tr>";
+  }
+  tableBodyRowElement += "<tr>";
   for (var key in log) {
     tableBodyRowElement += ("<td>" + log[key] + "</td>");
   }
   tableBodyRowElement += "</tr>";
 
+
   return tableBodyRowElement;
 }
 
+function getDiffWeekWithToday(today, date) {
+  var todayFullYear = today.getFullYear();
+  var dateFullYear = date.getFullYear();
+
+  if (todayFullYear === dateFullYear) {
+    return getWeekOfYear(today) - getWeekOfYear(date);
+  } else {
+    var yearDiff = todayFullYear - dateFullYear;
+    
+    return (yearDiff * 52) + getWeekOfYear(today) - getWeekOfYear(date);
+  }
+}
+
+function getWeekOfYear(date) {
+  var onejan = new Date(date.getFullYear(),0,1);
+  return Math.ceil((((date - onejan) / 86400000) + onejan.getDay()+1)/7);
+}
 
 module.exports.parsingAuthinfoOnGitConfig = parsingAuthinfoOnGitConfig;
 module.exports.getUserHome = getUserHome;
@@ -141,3 +167,4 @@ module.exports.sortAndMergeLogList = sortAndMergeLogList;
 module.exports.createTableHeadRowElement = createTableHeadRowElement;
 module.exports.createTableBodyRowElement = createTableBodyRowElement;
 module.exports.sortByOption = sortByOption;
+module.exports.getWeekOfYear = getWeekOfYear;
