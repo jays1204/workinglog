@@ -45,11 +45,23 @@ function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
       jQuery("div.row table.table thead tr").remove();
       jQuery("div.row table.table thead").append(tableHeadRowElement);
 
+      var divideElementInserted = {};
       for (var i = 0, li = result.length; i < li; i++) {
+        if (divideElementInserted[result[i].diffWeek] == null) {
+          divideElementInserted[result[i].diffWeek] = result[i].diffWeek;
+          
+          if (result[i].diffWeek === 0) {
+            var tdCount = Object.keys(result[0]).length - 2;
+            console.log('tdCo', tdCount);
+            jQuery("div.row table.table tbody").append("<tr style='background-color: #d9edf7;'><td> This Week </td>" + (utilLibs.repeatElement("<td></td>", tdCount)) + "</tr>");
+          } else {
+            jQuery("div.row table.table tbody").append("<tr style='background-color: #d9edf7;'><td> Before" + result[i].diffWeek 
+                + " Weeks </td>" + (utilLibs.repeatElement("<td></td>", tdCount)) + "</tr>");
+          }
+        }
         var trElement = utilLibs.createTableBodyRowElement(result[i]);
         jQuery("div.row table.table tbody").append(trElement);
       }
-      jQuery("div.row table.table tbody").prepend("<tr><td>This week</td></tr>");
       return;
     }
       );
@@ -99,11 +111,23 @@ function renderSpecificRepositoryLog(jQuery, gitDir, sortOption) {
         jQuery("div.row table.table tbody tr").remove();
 
         logInfo.logArr = utilLibs.sortByOption(logInfo.logArr, sortOption.desc);
-
+        var divideElementInserted = {};
         for (var i = 0, li = logInfo.logArr.length; i < li; i++) {
+          if (divideElementInserted[logInfo.logArr[i].diffWeek] == null) {
+            divideElementInserted[logInfo.logArr[i].diffWeek] = logInfo.logArr[i].diffWeek;
+
+            if (logInfo.logArr[i].diffWeek === 0) {
+              var tdCount = Object.keys(logInfo.logArr[0]).length - 2;
+              jQuery("div.row table.table tbody").append("<tr style='background-color: #d9edf7;'><td> This Week </td>" + (utilLibs.repeatElement("<td></td>", tdCount)) + "</tr>");
+            } else {
+              jQuery("div.row table.table tbody").append("<tr style='background-color: #d9edf7;'><td> Before" + logInfo.logArr[i].diffWeek 
+                  + " Weeks </td>" + (utilLibs.repeatElement("<td></td>", tdCount)) + "</tr>");
+            }
+          }
           var trElement = utilLibs.createTableBodyRowElement(logInfo.logArr[i]);
           jQuery("div.row table.table tbody").append(trElement);
         }
+
       }
   );
 }
@@ -172,7 +196,6 @@ function triggerSortByDateEvent(jQuery) {
   jQuery("#addressbar div.btn-group ul.dropdown-menu li a[value=Asc]").on('click', function () {
     var selectedGitRepoItem = global.settings.selected;
     if (selectedGitRepoItem.length === 1) {
-      console.log('hihihi asc');
       renderSpecificRepositoryLog(jQuery, selectedGitRepoItem[0], {"desc" : false});
     } else {
       triggerDefaultDisplayLogEvent(jQuery, selectedGitRepoItem, {"desc": false});

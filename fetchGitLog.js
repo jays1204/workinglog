@@ -1,5 +1,6 @@
 var spawn = require('child_process').spawn;
 var step = require('step');
+var utilLibs = require('./utils.js');
 
 //depreacted
 function _fetchDevelopLog(gitDirPath, author, callback) {
@@ -60,12 +61,15 @@ function fetchDevelopLog(gitDir, author, callback) {
       var msgLength = logMsg.length;
       if (logHash.length === msgLength && msgLength === logHash.length) {
         var resultArr = [];
-        
+        var today = new Date();
+
         for (var i = 0, li = msgLength; i < li; i ++) {
+          var diffWeek = utilLibs.getDiffWeekWithToday(today, new Date(logDate[i]));
           resultArr[i] = {
             "message" : logMsg[i],
             "date" : logDate[i],
-            "hash" : logHash[i]
+            "hash" : logHash[i],
+            "diffWeek" : parseInt(diffWeek, 10)
           };
         }
 

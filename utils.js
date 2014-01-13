@@ -70,24 +70,6 @@ function sortAndMergeLogList(repositoryInfoArr, isDesc) {
     concatArr = concatArr.concat(repositoryInfoArr[i].logArr);
   }
  
-  /*
-  //sort by option
-  if (isDesc === true) {
-    concatArr.sort(function (a,b) {
-      a = new Date(a.date);
-      b = new Date(b.date);
-
-      return a > b ? -1 : a < b ? 1 : 0;
-    });
-  } else {
-    concatArr.sort(function (a,b) {
-      a = new Date(a.date);
-      b = new Date(b.date);
-
-      return a < b ? -1 : a > b ? 1 : 0;
-    });
-  }
-*/
   return sortByOption(concatArr, isDesc);;
 }
 
@@ -115,7 +97,9 @@ function sortByOption(concatArr, isDesc) {
 function createTableHeadRowElement(log) {
   var tableHeadRowElement = "<tr>";
   for (var key in log) {
-    tableHeadRowElement += ("<th>" + key + "</th>");
+    if (key != "diffWeek") {
+      tableHeadRowElement += ("<th>" + key + "</th>");
+    }
   }
   tableHeadRowElement += "</tr>";
 
@@ -123,24 +107,37 @@ function createTableHeadRowElement(log) {
 }
 
 function createTableBodyRowElement(log) {
-  var tableBodyRowElement = "";
+  var tableBodyRowElement = "<tr>";
 
+  for (var key in log) {
+    if (key != "diffWeek") {
+      tableBodyRowElement += ("<td>" + log[key] + "</td>");
+    }
+  }
+  tableBodyRowElement += "</tr>";
+
+  return tableBodyRowElement;
+}
+
+function createSetTableBodyRow(logs) {
   var today = new Date();
   var logDay = new Date(log.date);
 
   if (today.getDay() === logDay.getDay()) {
     var diffWeek = getDiffWeekWithToday(today, logDay);
-    tableBodyRowElement += "<tr><td>Before " + diffWeek + " weeks</td></tr>";
+    if (diffWeek != 0) {
+      tableBodyRowElement += "<tr><td>Before " + diffWeek + " weeks</td></tr>";
+    }
   }
-  tableBodyRowElement += "<tr>";
-  for (var key in log) {
-    tableBodyRowElement += ("<td>" + log[key] + "</td>");
+
+  var returnElement = "";
+  for (var i = 0, li = logs.length; i < li; i++) {
+    returnElement += createTableBodyRowElement(logs[i]);
   }
-  tableBodyRowElement += "</tr>";
 
-
-  return tableBodyRowElement;
+  return returnElement;
 }
+
 
 function getDiffWeekWithToday(today, date) {
   var todayFullYear = today.getFullYear();
@@ -160,6 +157,16 @@ function getWeekOfYear(date) {
   return Math.ceil((((date - onejan) / 86400000) + onejan.getDay()+1)/7);
 }
 
+function repeatElement(el, count) {
+  var result = "";
+
+  for (var i = 0; i < count; i++) {
+    result += el;
+  }
+
+  return result;
+}
+
 module.exports.parsingAuthinfoOnGitConfig = parsingAuthinfoOnGitConfig;
 module.exports.getUserHome = getUserHome;
 module.exports.fetchAbsolutePath = fetchAbsolutePath;
@@ -168,3 +175,5 @@ module.exports.createTableHeadRowElement = createTableHeadRowElement;
 module.exports.createTableBodyRowElement = createTableBodyRowElement;
 module.exports.sortByOption = sortByOption;
 module.exports.getWeekOfYear = getWeekOfYear;
+module.exports.getDiffWeekWithToday = getDiffWeekWithToday;
+module.exports.repeatElement = repeatElement;
