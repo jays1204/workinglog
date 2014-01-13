@@ -23,10 +23,6 @@ var eventTrigger = require('./eventTrigger.js');
 var repositories = require('./repositories.js'); 
 var logFetcher = require('./fetchGitLog.js');
 var author = global.settings.author;
-var inputAuthorName;
-var duration = {
-  
-};
 
 $(document).ready(function() {
   //init setting
@@ -40,6 +36,9 @@ $(document).ready(function() {
   eventTrigger.showAllBtn(jQuery);
   eventTrigger.setDuration(jQuery);
 
+  jQuery("#about").on('click', function () {
+    alert("Not support yet\nContact to jays1204@naver.com\nhttps://github.com/jays1204/workinglog");
+  });
   step(
     function () {
       loadAuthorInfo(jQuery, this);
@@ -89,7 +88,7 @@ function triggerEditAuthorInfoEvent(jQuery) {
 
 function triggerInputAuthorInfoEvent(jQuery) {
   jQuery("#inputAuthorInfoModal div.modal-footer button[type='submit']").on('click', function () {
-    inputAuthorName = jQuery("#inputAuthorInfoModal div.modal-body form input").val();
+    var inputAuthorName = jQuery("#inputAuthorInfoModal div.modal-body form input").val();
     sideMenuEventLogic.inputAuthorInfo(jQuery, inputAuthorName);
   });
 }
