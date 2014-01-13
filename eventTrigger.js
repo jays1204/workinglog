@@ -1,4 +1,4 @@
-var logFetcher = require('./fetchGitLog.js');
+var logFetcher = require('./fetchGitLog.js').developLog;
 var repositories = require('./repositories.js');
 var utilLibs = require('./utils.js');
 var step = require('step'); 
@@ -7,9 +7,10 @@ var repoListDb = global.settings.repoListDb;
 var authorInfoDb = global.settings.authorInfoDb;
 var alertMsg = global.settings.alertMsg;
 
+//alertMsg("HIHIHI");
 //display all my local git repository log list
 function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
-  removeRepositoryNameOnAddressBar(jQuery);
+  //removeRepositoryNameOnAddressBar(jQuery);
   jQuery("div.row table.table tbody tr").remove();
 
   if (infoArr.length === 0) {
@@ -29,7 +30,7 @@ function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
         var group = this.group();
 
         for (var i = 0, li = infoArr.length; i < li; i++) {
-          logFetcher.developLog(infoArr[i], doc.authorName, group());
+          logFetcher(infoArr[i], doc.authorName, group());
         }
     },
     function done(err, data) {
@@ -44,7 +45,19 @@ function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
       jQuery("div.row table.table thead tr").remove();
       jQuery("div.row table.table thead").append(tableHeadRowElement);
 
+      var divideElementInserted = {};
       for (var i = 0, li = result.length; i < li; i++) {
+        if (divideElementInserted[result[i].diffWeek] == null) {
+          divideElementInserted[result[i].diffWeek] = result[i].diffWeek;
+          
+          if (result[i].diffWeek === 0) {
+            var tdCount = Object.keys(result[0]).length - 2;
+            jQuery("div.row table.table tbody").append("<tr style='background-color: #d9edf7;'><td> This Week </td>" + (utilLibs.repeatElement("<td></td>", tdCount)) + "</tr>");
+          } else {
+            jQuery("div.row table.table tbody").append("<tr style='background-color: #d9edf7;'><td> Before" + result[i].diffWeek 
+                + " Weeks </td>" + (utilLibs.repeatElement("<td></td>", tdCount)) + "</tr>");
+          }
+        }
         var trElement = utilLibs.createTableBodyRowElement(result[i]);
         jQuery("div.row table.table tbody").append(trElement);
       }
@@ -78,12 +91,13 @@ function renderSpecificRepositoryLog(jQuery, gitDir, sortOption) {
           return err;
         }
 
-        logFetcher.developLog(gitDir, doc.authorName, this);
+        logFetcher(gitDir, doc.authorName, this);
       },
       function done(err, logInfo) {
         if (err) {
           //alertMsg('Fetch log ERR: ' + err);
           console.log(err);
+          return;
         }
 
         if (logInfo.logArr.length === 0) {
@@ -97,17 +111,29 @@ function renderSpecificRepositoryLog(jQuery, gitDir, sortOption) {
         jQuery("div.row table.table tbody tr").remove();
 
         logInfo.logArr = utilLibs.sortByOption(logInfo.logArr, sortOption.desc);
-
+        var divideElementInserted = {};
         for (var i = 0, li = logInfo.logArr.length; i < li; i++) {
+          if (divideElementInserted[logInfo.logArr[i].diffWeek] == null) {
+            divideElementInserted[logInfo.logArr[i].diffWeek] = logInfo.logArr[i].diffWeek;
+
+            if (logInfo.logArr[i].diffWeek === 0) {
+              var tdCount = Object.keys(logInfo.logArr[0]).length - 2;
+              jQuery("div.row table.table tbody").append("<tr style='background-color: #d9edf7;'><td> This Week </td>" + (utilLibs.repeatElement("<td></td>", tdCount)) + "</tr>");
+            } else {
+              jQuery("div.row table.table tbody").append("<tr style='background-color: #d9edf7;'><td> Before" + logInfo.logArr[i].diffWeek 
+                  + " Weeks </td>" + (utilLibs.repeatElement("<td></td>", tdCount)) + "</tr>");
+            }
+          }
           var trElement = utilLibs.createTableBodyRowElement(logInfo.logArr[i]);
           jQuery("div.row table.table tbody").append(trElement);
         }
+
       }
   );
 }
 
 function triggerDeleteRepositoryEvent(jQuery, value, name) {
-  jQuery("a[value='" + value + "']").next().on('click', function () {
+  jQuery("div.well div.panel table.table tbody tr td a[value='" + value +"']").parent().parent().find('button').on('click', function () {
     repositories.deleteRepository(value, name, function (err) {
       if (err) {
         //alertMsg("Delete Repository ERR: " + err);
@@ -115,9 +141,10 @@ function triggerDeleteRepositoryEvent(jQuery, value, name) {
         return;
       }
 
-      jQuery("a[value='" + value + "']").parent().remove();
+      jQuery("div.well div.panel table.table tbody tr td a[value='" + value + "']").parent().parent().remove();
     });
   });
+
 }
 
 function triggerAddRepositoryEvent(jQuery) {
@@ -131,10 +158,7 @@ function triggerAddRepositoryEvent(jQuery) {
         console.log('add Repo', err);
           return;
         }
-        var liElement = "<li class='dirList' style='display: -webkit-inline-box;'><a href='#' value='" + dirInfo.path + "'><i class='icon-book'></i>" + dirInfo.name 
-        + "</a><button class='btn btn-mini'><i class='icon-minus'></i></button></li>";
-
-        jQuery("div.well ul.nav-list li.divider").before(liElement);
+        insertRepositoryElement(jQuery, dirInfo);
         triggerDisplayLogOnSpecificRepositoryEvent(jQuery, dirInfo);
       });
     });
@@ -142,18 +166,23 @@ function triggerAddRepositoryEvent(jQuery) {
 }
 
 function triggerDisplayRepositoryListEvent(jQuery, docs) {
-  jQuery("div.well ul.nav-list li.dirList").remove();
+  jQuery("div.well div.panel table.table tbody tr").remove();
 
   triggerDefaultDisplayLogEvent(jQuery, docs, {"desc": true});
   //insert repository element and trigger display and  delete event
   for (var i = 0, li = docs.length; i < li; i++) {
-    var liElement = "<li class='dirList' style='display: -webkit-inline-box;'><a href='#' value='" + docs[i].path + "'><i class='icon-book'></i>" + docs[i].name 
-      + "</a><button class='btn btn-mini'><i class='icon-minus'></i></button></li>";
-    jQuery("div.well ul.nav-list li.divider").before(liElement);
-
+    insertRepositoryElement(jQuery, docs[i]);
     triggerDisplayLogOnSpecificRepositoryEvent(jQuery, docs[i]);
     triggerDeleteRepositoryEvent(jQuery, docs[i].path, docs[i].name);
   }
+}
+
+function insertRepositoryElement(jQuery, doc) {
+  var trElement = "<tr><td><a href='#' value='" + doc.path + "'><span class='glyphicon glyphicon-book' style='padding-right: 20px;'></span>" 
+    + doc.name + "</a></td><td>" + "<button class='btn btn-default'><span class='glyphicon glyphicon-minus'></span></button>";
+
+  jQuery("div.well div.panel table.table tbody").append(trElement);
+  //jQuery("div.well ul.nav-list li.divider").before(liElement);
 }
 
 function triggerSortByDateEvent(jQuery) {
@@ -170,12 +199,20 @@ function triggerSortByDateEvent(jQuery) {
   jQuery("#addressbar div.btn-group ul.dropdown-menu li a[value=Asc]").on('click', function () {
     var selectedGitRepoItem = global.settings.selected;
     if (selectedGitRepoItem.length === 1) {
-      console.log('hihihi asc');
       renderSpecificRepositoryLog(jQuery, selectedGitRepoItem[0], {"desc" : false});
     } else {
       triggerDefaultDisplayLogEvent(jQuery, selectedGitRepoItem, {"desc": false});
     }
 
+  });
+}
+
+function triggerSetDisplayLogWithDuration(jQuery) {
+  jQuery("#thisWeekBtn").on('click', function () {
+    logFetcher = require('./fetchGitLog.js').thisWeekLog; 
+  });
+  jQuery("#entireBtn").on('click', function () {
+    logFetcher = require('./fetchGitLog.js').developLog;
   });
 }
 
@@ -197,11 +234,11 @@ function triggerShowAllEvent(jQuery) {
   });
 }
 
-
 module.exports.displasyLogOnSpecificRepository = triggerDisplayLogOnSpecificRepositoryEvent;
 module.exports.deleteRepository = triggerDeleteRepositoryEvent;
 module.exports.addRepository = triggerAddRepositoryEvent;
 module.exports.displayRepositoryList = triggerDisplayRepositoryListEvent;
+module.exports.setDuration = triggerSetDisplayLogWithDuration;
 
 module.exports.sortByDate = triggerSortByDateEvent;
 module.exports.showAllBtn = triggerShowAllEvent;

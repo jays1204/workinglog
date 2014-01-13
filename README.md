@@ -9,11 +9,15 @@ version : 0.1
 - Enable SVN LOG(will be...)
 - Run on OS/X, Linux, Win32
 
+# Warning
+- Support Not yet svn, git-svn
+
 # How to Run?
 - First
   - Install node-webkit
       
           
   See this page : https://github.com/rogerwang/node-webkit
-  - Second
+
+- Second
   - Run this Command :  $ node-webkit ./workingLog
