@@ -16,25 +16,36 @@
     }
   });
 </script>
-<link href="bootstrap/css/bootstrap.css" rel="stylesheet">
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="style.css" rel="stylesheet">
 <script type="text/javascript" src="js/jquery-1.7.2.js"></script>
+<script type="text/javascript" scr="js/jquery.fixedheadertable.min.js"></script>
 <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="app.js"></script>
 </head>
 <body>
 <div style="position: absolute; left: 10px; right: 10px; top: 10px; bottom: 10px;">
-  <div class="well" style="width: 160px; padding: 8px;">
-    <ul class="nav nav-list">
-      <li class="nav-header">Repository List</li>
-      <li class="divider"></li>
-      <li><a href="#"><i class="icon-flag"></i> About</a></li>
-    </ul>
+  <div class="well" style="width: 190px; padding: 8px;">
+    <div class="panel panel-default">
+      <!-- Default panel contents -->
+      <div class="panel-heading">Repository List</div>
+
+      <table class="table">
+        <thead></thead>
+        <tbody>
+          <tr>
+            <td><a href='#' value='maval'><span class='glyphicon glyphicon-book'></span>maname</a></td>
+              <td><button class='btn btn-default'><span class='glyphicon glyphicon-minus'></span></button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <a href="#"><span class="glyphicon glyphicon-info-sign"></span> About</a>
   </div>
   
   <div class="editRepository" style="witdh: 160px; padding: 8px;">
     <h5>Repository Management</h5>
-    <div class="btn-group">
+    <div class="btn-group btn-group-sm">
       <input type="file" id="addRepoInput" webkitdirectory directory multiple style="visibility: hidden; display: block; width: 0; height: 0;"/>
       <button type-"button" class="btn btn-default" id="addRepo">Add</button>
     </div>
@@ -42,14 +53,16 @@
 
   <div class="setDuration" style="width: 160px; padding: 8px;">
     <h5>Set Duration</h5>
-    <div class="btn-group">
+    <div class="btn-group btn-group-sm">
       <button class="btn btn-default">Entire</button>
     </div>
   </div>
   <div class="setInfo" style="float: left; width: 160px; padding: 8px;">
     <h5>Set Info</h5>
-    <button class="btn btn-default" id="editInfoBtn">Set Info</button>
-    <button class="btn btn-default" id="initDbBtn">Init Config</button>
+    <div class="btn-group btn-group-sm">
+      <button type='button' class="btn btn-default" id="editInfoBtn">Set Info</button>
+      <button type='button' class="btn btn-default" id="initDbBtn">Init Config</button>
+    </div>
   </div>
 
   <div style="float: left; position: absolute; left: 210px; right: 0; top: 0; bottom: 50px">

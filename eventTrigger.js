@@ -10,7 +10,7 @@ var alertMsg = global.settings.alertMsg;
 //alertMsg("HIHIHI");
 //display all my local git repository log list
 function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
-  removeRepositoryNameOnAddressBar(jQuery);
+  //removeRepositoryNameOnAddressBar(jQuery);
   jQuery("div.row table.table tbody tr").remove();
 
   if (infoArr.length === 0) {
@@ -52,7 +52,6 @@ function triggerDefaultDisplayLogEvent(jQuery, infoArr, sortOption) {
           
           if (result[i].diffWeek === 0) {
             var tdCount = Object.keys(result[0]).length - 2;
-            console.log('tdCo', tdCount);
             jQuery("div.row table.table tbody").append("<tr style='background-color: #d9edf7;'><td> This Week </td>" + (utilLibs.repeatElement("<td></td>", tdCount)) + "</tr>");
           } else {
             jQuery("div.row table.table tbody").append("<tr style='background-color: #d9edf7;'><td> Before" + result[i].diffWeek 
@@ -133,7 +132,7 @@ function renderSpecificRepositoryLog(jQuery, gitDir, sortOption) {
 }
 
 function triggerDeleteRepositoryEvent(jQuery, value, name) {
-  jQuery("a[value='" + value + "']").next().on('click', function () {
+  jQuery("div.well div.panel table.table tbody tr td a[value='" + value +"']").parent().parent().find('button').on('click', function () {
     repositories.deleteRepository(value, name, function (err) {
       if (err) {
         //alertMsg("Delete Repository ERR: " + err);
@@ -141,9 +140,10 @@ function triggerDeleteRepositoryEvent(jQuery, value, name) {
         return;
       }
 
-      jQuery("a[value='" + value + "']").parent().remove();
+      jQuery("div.well div.panel table.table tbody tr td a[value='" + value + "']").parent().parent().remove();
     });
   });
+
 }
 
 function triggerAddRepositoryEvent(jQuery) {
@@ -157,10 +157,7 @@ function triggerAddRepositoryEvent(jQuery) {
         console.log('add Repo', err);
           return;
         }
-        var liElement = "<li class='dirList' style='display: -webkit-inline-box;'><a href='#' value='" + dirInfo.path + "'><i class='icon-book'></i>" + dirInfo.name 
-        + "</a><button class='btn btn-mini'><i class='icon-minus'></i></button></li>";
-
-        jQuery("div.well ul.nav-list li.divider").before(liElement);
+        insertDirListElement(jQuery, dirInfo);
         triggerDisplayLogOnSpecificRepositoryEvent(jQuery, dirInfo);
       });
     });
@@ -168,18 +165,24 @@ function triggerAddRepositoryEvent(jQuery) {
 }
 
 function triggerDisplayRepositoryListEvent(jQuery, docs) {
-  jQuery("div.well ul.nav-list li.dirList").remove();
+  //jQuery("div.well ul.nav-list li.dirList").remove();
+  jQuery("div.well div.panel table.table tbody tr").remove();
 
   triggerDefaultDisplayLogEvent(jQuery, docs, {"desc": true});
   //insert repository element and trigger display and  delete event
   for (var i = 0, li = docs.length; i < li; i++) {
-    var liElement = "<li class='dirList' style='display: -webkit-inline-box;'><a href='#' value='" + docs[i].path + "'><i class='icon-book'></i>" + docs[i].name 
-      + "</a><button class='btn btn-mini'><i class='icon-minus'></i></button></li>";
-    jQuery("div.well ul.nav-list li.divider").before(liElement);
-
+    insertDirListElement(jQuery, docs[i]);
     triggerDisplayLogOnSpecificRepositoryEvent(jQuery, docs[i]);
     triggerDeleteRepositoryEvent(jQuery, docs[i].path, docs[i].name);
   }
+}
+
+function insertDirListElement(jQuery, doc) {
+  var trElement = "<tr><td><a href='#' value='" + doc.path + "'><span class='glyphicon glyphicon-book' style='padding-right: 20px;'></span>" 
+    + doc.name + "</a></td><td>" + "<button class='btn btn-default'><span class='glyphicon glyphicon-minus'></span></button>";
+
+  jQuery("div.well div.panel table.table tbody").append(trElement);
+  //jQuery("div.well ul.nav-list li.divider").before(liElement);
 }
 
 function triggerSortByDateEvent(jQuery) {
