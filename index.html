@@ -3,25 +3,6 @@
 <head>
 <title>WorkingLog</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script>
-  var Gaze = require('gaze').Gaze;
-  var gaze = new Gaze(['./*.js', './*.html']);
-
-  gaze.on('all', function (event, filepath) {
-    if (location) {
-      //FIXME : When event 'all' occurs, *.html is refreshed, but *.js it not. Why?
-      event === "changed" ? console.log(filepath + " is changed") : null;
-      //Assign true value at reload option. This stop Cache.
-      location.reload(true);
-    }
-  });
-</script>
-<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
-<link href="style.css" rel="stylesheet">
-<script type="text/javascript" src="js/jquery-1.7.2.js"></script>
-<script type="text/javascript" src="js/jquery.fixedheadertable.min.js"></script>
-<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="app.js"></script>
 </head>
 <body>
 <div style="position: absolute; left: 10px; right: 10px; top: 10px; bottom: 10px;">
@@ -156,6 +137,26 @@
 </div>
 
 </body>
+<script>
+  require('nw.gui').Window.get().showDevTools();
+  var Gaze = require('gaze').Gaze;
+  var gaze = new Gaze(['./*.js', './*.html']);
+
+  gaze.on('all', function (event, filepath) {
+    if (location) {
+      //FIXME : When event 'all' occurs, *.html is refreshed, but *.js it not. Why?
+      event === "changed" ? console.log(filepath + " is changed") : null;
+      //Assign true value at reload option. This stop Cache.
+      location.reload(true);
+    }
+  });
+</script>
+<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+<script type="text/javascript" src="js/jquery-1.7.2.js"></script>
+<script type="text/javascript" src="js/jquery.fixedheadertable.min.js"></script>
+<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="app.js"></script>
 <script>
 //  $("div.well div.panel table.table").fixedHeaderTable('show');
 </script>

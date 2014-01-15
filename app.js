@@ -6,7 +6,7 @@ global.settings.alertMsg = window.alert;
 
 var fs = require('fs');
 var path = require('path');
-var shell = require('nw.gui').Shell;
+//var shell = require('nw.gui').Shell;
 var step = require('step');
 var Datastore = require('nedb');
 var path = require('path');
